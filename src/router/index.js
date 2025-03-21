@@ -4,6 +4,10 @@ import LecturerView from "../views/LecturerView.vue";
 
 const routes = [
   {
+    path: "/",
+    redirect: '/lectures'
+  },
+  {
     path: "/lectures",
     name: "lectures",
     component: LectureView,
