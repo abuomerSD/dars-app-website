@@ -49,6 +49,9 @@
             </table>
         </div>
         <!-- lecturers list end -->
+        <!-- Pagination start-->
+        <Pagination :props="lecturers" />
+        <!-- Pagination end-->
     </div>
 </template>
 
@@ -56,6 +59,7 @@
 import { findAllLecturers } from "../assets/js/lecturer";
 import { onMounted, ref } from "vue";
 import { STATIC_FILES_URL } from "../assets/js/constants";
+import Pagination from '../components/Pagination.vue';
 
 const lecturers = ref([]);
 const staticFilesUrl = ref(STATIC_FILES_URL);

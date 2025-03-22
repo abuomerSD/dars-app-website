@@ -3,45 +3,54 @@
 <div class="container">
     <!-- add lecture start -->
     <div class="add-lecture">
-        <div class="row">
-            <div class="col input-group mb-3">
-                <label class="m-2" for="">عنوان المحاضرة</label>
-                <input
-                type="text"
-                class="form-control"
-                />
+        <form enctype="multipart/form-data">
+            <div class="row">
+                <div class="col input-group mb-3">
+                    <label class="m-2" for="">عنوان المحاضرة</label>
+                    <input
+                    type="text"
+                    class="form-control"
+                    v-model="lecture.title"
+                    />
+                </div>
+                <div class="col input-group mb-3">
+                    <label class="m-2" for="">اسم المحاضر</label>
+                    <input
+                    type="search"
+                    list="lecturers-list"
+                    class="form-control"
+                    v-model="lecture.lecturer"
+                    />
+                </div>
+                <div class="col input-group mb-3">
+                    <label class="m-2" for="">التاريخ</label>
+                    <input type="date" class="form-control" v-model="lecture.date">
+                </div>
             </div>
-            <div class="col input-group mb-3">
-                <label class="m-2" for="">اسم المحاضر</label>
-                <input
-                type="search"
-                list="lecturers-list"
-                class="form-control"
-                />
-            </div>
-            <div class="col input-group mb-3">
-                <label class="m-2" for="">التاريخ</label>
-                <input type="date" class="form-control">
-            </div>
-                <div class="row">
-                    <div class="col input-group mb-3">
+            <div class="row">
+                <div class="col input-group mb-3">
                         <label class="m-2" for="">الصورة</label>
                         <input type="file" class="form-control">
                     </div>
                     <div class="col-sm-3 input-group mb-3">
-                        <label class="m-2" for="">الوصف</label>
-                        <!-- <input
+                        <label class="m-2" for="">المكان</label>
+                        <input
                         type="text"
                         class="form-control"
-                        /> -->
-                        <textarea name="" id="" cols="30" rows="2"></textarea>
+                        v-model="lecture.location"
+                        />
                     </div>
-              </div>
-        <div class="row">
-            <div class="col input-group mb-3">
-                <button class="btn btn-success">حفظ</button>
-            </div>  
-    </div>
+                    <div class="col-sm-3 input-group mb-3">
+                        <label class="m-2" for="">الوصف</label>
+                        <textarea name="" id="" cols="30" rows="2" v-model="lecture.description"></textarea>
+                    </div>
+            </div>
+            <div class="row">
+                <div class="col input-group mb-3">
+                    <button class="btn btn-success" type="submit" @click="handleSave">حفظ</button>
+                </div> 
+            </div>
+        </form>
     <!-- add lecture end -->
     <hr>
     <h4>قائمة المحاضرات</h4>
@@ -61,7 +70,6 @@
                 </tr>
             </thead>
             <tbody>
-                
                 <div hidden>{{ row = 1}}</div>
                 <tr v-for="lecture in lectures" :key="lecture.title">
                     <th scope="row">{{ row }}</th>
@@ -95,14 +103,14 @@
     <datalist id="lecturers-list">
         <option v-for="lecturer in lectueres" :key="lecturer.name" >{{ lecturer.name }}</option>
     </datalist>
-</div>
+
 </template>
 
 <script setup>
     import { findAllLecturers } from "../assets/js/lecturer";
     import { onMounted, ref, watch } from "vue";
     import { useRoute } from "vue-router";
-    import { findAllLectures } from "../assets/js/lecture";
+    import { findAllLectures, saveLecture } from "../assets/js/lecture";
     import { API_URL, STATIC_FILES_URL } from "../assets/js/constants";
 
 
@@ -112,9 +120,10 @@
     const lectures = ref([]);
     const lectueres = ref([]);
     const staticFilesUrl = ref(STATIC_FILES_URL);
-    const apiUrl = ref(API_URL);
+    const apiUrl = ref(API_URL + 'lectures');
     const test = ref([{name:"eltayeb", id:1}, {name:"ahmed", id:2}]);
     const route = useRoute();
+    const lecture = ref({title: '', lecturer: '', date: '', location: '',description: ''});
 
     // watch(() => route.params.id, fetchData, { immediate: true });
 
@@ -129,6 +138,17 @@
     async function fecthLectures() {
         try {
             lectures.value = await findAllLectures();
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    // handlers 
+    async function handleSave(e) {
+        try {
+            console.log(lecture);
+            const savedLecture = await saveLecture(lecture);
+            console.log(saveLecture);
         } catch (error) {
             console.log(error);
         }
