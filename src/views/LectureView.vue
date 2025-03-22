@@ -26,7 +26,7 @@
                 <div class="row">
                     <div class="col input-group mb-3">
                         <label class="m-2" for="">الصورة</label>
-                        <input type="file" class="">
+                        <input type="file" class="form-control">
                     </div>
                     <div class="col-sm-3 input-group mb-3">
                         <label class="m-2" for="">الوصف</label>
@@ -39,7 +39,7 @@
               </div>
         <div class="row">
             <div class="col input-group mb-3">
-                <button type="file" class="btn btn-success">حفظ</button>
+                <button class="btn btn-success">حفظ</button>
             </div>  
     </div>
     <!-- add lecture end -->
@@ -72,7 +72,7 @@
                     <td>{{ lecture.description }}</td>
                     <td><img :src="staticFilesUrl + lecture.image" alt="صورة" class="table-image"></td>
                     <td><button class="btn btn-primary m-2">تعديل</button><button class="btn btn-danger">حذف</button></td>
-                    {{ row++ }}
+                    <div hidden>{{ row++ }}</div>
                 </tr>
             </tbody>
         </table>
