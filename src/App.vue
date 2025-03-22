@@ -12,6 +12,7 @@
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  /* background: #EEE; */
 }
 
 nav {
@@ -25,5 +26,11 @@ nav a {
 
 nav a.router-link-exact-active {
   color: #42b983;
+}
+
+/* table images */
+.table-image {
+  width: 100px;
+  height: 100px;
 }
 </style>
