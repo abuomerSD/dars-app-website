@@ -2,7 +2,7 @@
     <!-- Add Lecture Start -->
     <div class="add-lecture">
         <h4>إضافة محاضرة</h4>
-        <form enctype="multipart/form-data" @submit.prevent="handleSave">
+        <form @submit.prevent="handleSave">
             <div class="row">
                 <div class="col-lg-4 mb-3">
                     <label class="m-2" for="">عنوان المحاضرة</label>
@@ -29,7 +29,7 @@
             <div class="row">
                 <div class="col-lg-4 mb-3">
                     <label class="m-2" for="">الصورة</label>
-                    <input type="file" class="form-control">
+                    <input type="file" class="form-control" ref="image" />
                 </div>
                 <div class="col-lg-4 mb-3">
                     <label class="m-2" for="">المكان</label>
@@ -60,6 +60,8 @@
 
 <script>
 import { findAllLecturers } from "../../assets/js/lecturer";
+import { saveLecture } from "../../assets/js/lecture";
+
 export default {
     data() {
         return {
@@ -68,15 +70,28 @@ export default {
                 lecturer: '',
                 date: '',
                 location: '',
-                description: ''
+                description: '',
+                image: '',
             },
             lectueres: [],
         }
     },
     methods: {
-        handleSave(e) {
+        async handleSave(e) {
             e.preventDefault();
-            console.log(this.lecture);
+            let formData = new FormData();
+            formData.append('title', this.lecture.title);
+            formData.append('lecturer', this.lecture.lecturer);
+            formData.append('date', this.lecture.date);
+            formData.append('location', this.lecture.location);
+            formData.append('description', this.lecture.description);
+            formData.append('image', this.$refs.image.files[0]);
+
+            // this.lecture.image = this.$refs.image.files[0];
+            // const stringified = JSON.stringify(this.lecture);
+            const saved = await saveLecture(formData);
+            // console.log(stringified);
+            console.log(saved);
         },
         async fetchLecturers() {
         try {
