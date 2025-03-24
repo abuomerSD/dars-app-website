@@ -1,6 +1,8 @@
 <template>
   <Navbar />
-  <router-view/>
+  <div class="container">
+    <router-view/>
+  </div>
 </template>
 <script setup>
   import Navbar from './components/Navbar.vue';
@@ -32,5 +34,11 @@ nav a.router-link-exact-active {
 .table-image {
   width: 100px;
   height: 100px;
+}
+
+/* logo image */
+.logo {
+  width: 20px;
+  height: 20px;
 }
 </style>

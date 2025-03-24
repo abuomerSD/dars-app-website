@@ -16,13 +16,12 @@ import { PAGE_LIMIT } from '../assets/js/constants';
 import { onMounted, ref } from 'vue';
 
 export default {
-    setup(props) {
-        const data = props.data;
-        const pageLimit = ref(PAGE_LIMIT);
-        const pages = ref(10);
-       
-        // const pages = Math.ceil(data.length / pageLimit);
-    }
+    data() {
+        return {
+            pages: []
+        }
+    },
+    props: [],
 }
 
 </script>
