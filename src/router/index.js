@@ -9,6 +9,11 @@ const routes = [
     redirect: '/login'
   },
   {
+    name: 'home',
+    path: "/home",
+    redirect: '/lectures'
+  },
+  {
     path: "/lectures",
     name: "lectures",
     component: LectureView,
@@ -28,6 +33,15 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
+});
+
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('token');
+  if (to.meta.requiresAuth && !token) {
+    next('/');
+  } else {
+    next();
+  }
 });
 
 export default router;
