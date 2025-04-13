@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory } from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
 import LectureView from "../views/LectureView.vue";
 import LecturerView from "../views/LecturerView.vue";
 import LoginView from "../views/LoginView.vue";
@@ -6,7 +6,7 @@ import LoginView from "../views/LoginView.vue";
 const routes = [
   {
     path: "/",
-    redirect: '/lectures'
+    redirect: '/login'
   },
   {
     path: "/lectures",
@@ -26,7 +26,7 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(),
   routes,
 });
 
