@@ -1,24 +1,24 @@
 <template>
     <div class="container">
         <div class="justify-content-center  align-items-center">
-            <form class="form pt-5  ">
+            <form class="form pt-5" @submit.prevent="login">
                 <h3>تسجيل الدخول</h3>
                 <div class="row">
                     <div class="col-4"></div>
                     <div class="col-4">
-                        <input v-model="username" placeholder="اسم المستخدم" class="form-control m-2" />
+                        <input v-model="username" placeholder="اسم المستخدم" class="form-control m-2" value="" />
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-4"></div>
                     <div class="col-4">
-                        <input v-model="password" type="password" placeholder="كلمة المرور" class="form-control m-2" />
+                        <input v-model="password" type="password" placeholder="كلمة المرور" class="form-control m-2" vlaue=""/>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-4"></div>
                     <div class="col-4">
-                        <button @click="login" class="btn btn-success m-2">دخول</button>
+                        <button class="btn btn-success m-2">دخول</button>
                     </div>
                 </div>
                 <p>{{ error }}</p>
@@ -28,7 +28,7 @@
     </div>
 </template>
 <script>
-import login from '@/assets/js/user.js';
+import {login} from '@/assets/js/user.js';
 export default {
     name: 'LoginView',
     data()
@@ -36,19 +36,21 @@ export default {
         return {
             username: '',
             password: '',
-            error: ''
+            error: '',
+            token: '',
         }
     },
     methods: {
         async login()
         {
             const response = await login(this.username, this.password);
-            const token = response.data.token;
-            localStorage.setItem('token', token);
-            // this.$router.push({ name: 'home' });
-            if (this.username === 'admin' && this.password === 'admin')
+            this.token = response.data.token;
+            console.log(response);
+            this.$router.push({ name: 'home' });
+            if (response.data.token)
             {
-                this.$router.push({ name: 'home' });
+                localStorage.setItem('token', this.token);
+                console.log('logged');
             } else
             {
                 this.error = 'اسم المستخدم أو كلمة المرور غير صحيحة';

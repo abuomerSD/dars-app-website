@@ -11,17 +11,20 @@ const routes = [
   {
     name: 'home',
     path: "/home",
-    redirect: '/lectures'
+    redirect: '/lectures',
+    meta: {requiresAuth: true},
   },
   {
     path: "/lectures",
     name: "lectures",
     component: LectureView,
+    meta: {requiresAuth: true},
   },
   {
     path: "/lecturers",
     name: "lecturers",
     component: LecturerView,
+    meta: {requiresAuth: true},
   },
   {
     path: "/login",
