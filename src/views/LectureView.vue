@@ -5,7 +5,8 @@
         <div class="row">
             <div class="col-lg-11 col-sm-12"></div>
             <div class="col-lg-1 col-sm-12">
-                <a href="javascrip:void(0)"><i class='bx bx-plus-medical bx-sm'></i></a>
+                <a href="javascrip:void(0)" data-bs-toggle="modal" data-bs-target="#addLectureModal"><i
+                        class='bx bx-plus-medical bx-sm'></i></a>
             </div>
         </div>
         <div class="row">
@@ -34,28 +35,30 @@
                         </tr>
                     </tbody>
                 </table>
+                <b-pagination v-model="page" :total-rows="rows" :per-page="limit"
+                    aria-controls="my-table" class="m-2"></b-pagination>
             </div>
         </div>
         <!-- add lecture modal start -->
-        <!-- Button trigger modal -->
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-            Launch demo modal
-        </button>
-
-        <!-- Modal -->
-        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal fade" id="addLectureModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">إضافة محاضرة</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        ...
+                        <input type="text" placeholder="عنوان المحاضرة" class="form-control m-2">
+                        <multiselect v-model="selectedLecturer" :options="lecturersNames">اسم المحاضر</multiselect>
+                        <input type="date" placeholder="التاريخ" class="form-control m-2">
+                        <input type="text" placeholder="الموقع" class="form-control m-2">
+                        <input type="text" placeholder="الوصف" class="form-control m-2">
+                        <input type="file" placeholder="صورة الإعلان" class="form-control m-2">
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Save changes</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                        <button type="button" class="btn btn-primary">حفظ</button>
                     </div>
                 </div>
             </div>
@@ -67,7 +70,9 @@
 <script>
 import { STATIC_FILES_URL } from '@/assets/js/constants';
 import { findAllLectures } from '@/assets/js/lecture';
+import { findAllLecturers } from '@/assets/js/lecturer';
 import Navbar from '@/components/Navbar.vue';
+import Multiselect from 'vue-multiselect';
 
 export default {
     name: 'LectureView',
@@ -75,11 +80,17 @@ export default {
     {
         return {
             lectures: [],
+            lecturers: [],
+            lecturersNames:[],
             imgUrl: STATIC_FILES_URL,
+            page: 1,
+            rows: null,
+            limit: 10,
+            selectedLecturer: null,
         }
     },
     components: {
-        Navbar
+        Navbar, Multiselect
     },
     methods: {
         async fetchLectures()
@@ -87,6 +98,19 @@ export default {
             try
             {
                 this.lectures = await findAllLectures();
+                console.log('lectures', this.lectures)
+            } catch (error)
+            {
+                console.log(error);
+            }
+        },
+        async fetchLecturers() 
+        {
+            try
+            {
+                this.lecturers = await findAllLecturers();
+                console.log('lecturers', this.lecturers);
+                this.lecturers.forEach(l => this.lecturersNames.push(l.name));
             } catch (error)
             {
                 console.log(error);
@@ -96,12 +120,14 @@ export default {
     async mounted()
     {
         await this.fetchLectures();
+        await this.fetchLecturers();
+        this.rows = this.lectures.length;
     }
 }
 
 
 </script>
-
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 <style>
 .lecture-image {
     width: 150px;
