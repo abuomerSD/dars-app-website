@@ -45,15 +45,15 @@ export default {
         {
             const response = await login(this.username, this.password);
             this.token = response.data.token;
-            console.log(response);
-            this.$router.push({ name: 'home' });
-            if (response.data.token)
+            console.log('response', response);
+            if (response.data.status === 'success')
             {
+                this.$router.push({ name: 'home' });
                 localStorage.setItem('token', this.token);
                 console.log('logged');
             } else
             {
-                this.error = 'اسم المستخدم أو كلمة المرور غير صحيحة';
+                alert(response.data.message);
             }
         }
     }
