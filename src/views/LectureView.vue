@@ -21,6 +21,7 @@
                             <th scope="col">الموقع</th>
                             <th scope="col">الوصف</th>
                             <th scope="col">صورة الاعلان</th>
+                            <th scope="col">تعديل \ حذف</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -32,6 +33,7 @@
                             <td>{{ lecture.location }}</td>
                             <td>{{ lecture.description }}</td>
                             <td><img :src="imgUrl + lecture.image" alt="image" class="lecture-image"></td>
+                            <td><button class="btn btn-primary" @click="preUpdateLecture(lecture)">تعديل</button> <button class="btn btn-danger" @click="deleteLecture()">حذف</button></td>
                         </tr>
                     </tbody>
                 </table>
@@ -64,6 +66,7 @@
             </div>
         </div>
         <!-- add lecture modal end -->
+        <ConfirmationModal ref="confirmationModal" />
     </div>
 </template>
 
@@ -73,6 +76,7 @@ import { findAllLectures } from '@/assets/js/lecture';
 import { findAllLecturers } from '@/assets/js/lecturer';
 import Navbar from '@/components/Navbar.vue';
 import Multiselect from 'vue-multiselect';
+import ConfirmationModal from '@/components/modals/ConfirmationModal.vue';
 
 export default {
     name: 'LectureView',
@@ -87,10 +91,11 @@ export default {
             rows: null,
             limit: 10,
             selectedLecturer: null,
+            selectedLecture: null,
         }
     },
     components: {
-        Navbar, Multiselect
+        Navbar, Multiselect, ConfirmationModal,
     },
     methods: {
         async fetchLectures()
@@ -115,6 +120,28 @@ export default {
             {
                 console.log(error);
             }
+        },
+        preUpdateLecture(lecture) {
+            this.selectedLecture = lecture
+            this.$refs.confirmationModal.show( {
+                title: 'تأكيد',
+                message: `هل تريد تعديل المحاضرة ${lecture.title}`,
+                onConfirm: this.updateLecture
+            })
+        },
+        updateLecture() {
+            console.log(`update ${this.selectedLecture.title}`)   
+        },
+        preDeleteLecture(lecture) {
+            this.selectedLecture = lecture
+            this.$refs.confirmationModal.show( {
+                title: 'تأكيد',
+                message: `هل تريد حذف المحاضرة ${lecture.title}`,
+                onConfirm: this.deleteLecture
+            })
+        },
+        deleteLecture() {
+            console.log(`delete ${this.selectedLecture.title}`)  
         }
     },
     async mounted()

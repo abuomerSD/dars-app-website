@@ -15,7 +15,7 @@ export const findAllLectures = async () => {
 }
 
 export const saveLecture = async (formData) => {
-    console.log('formData ',formData.get('image'));
+    console.log('formData ',formData);
     for(var pair of formData.entries()) {
         console.log(pair[0]+', '+pair[1]);
     }
