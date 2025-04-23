@@ -1,10 +1,11 @@
 <script>
-import { STATIC_FILES_URL } from '@/assets/js/constants';
+import { STATIC_FILES_URL, API_URL, PAGE_LIMIT } from '@/assets/js/constants';
 import { findAllLectures, saveLecture } from '@/assets/js/lecture';
 import { findAllLecturers } from '@/assets/js/lecturer';
 import Navbar from '@/components/Navbar.vue';
 import Multiselect from 'vue-multiselect';
 import ConfirmationModal from '@/components/modals/ConfirmationModal.vue';
+import axios from 'axios';
 
 
 export default {
@@ -17,10 +18,10 @@ export default {
             lecturersNames: [],
             imgUrl: STATIC_FILES_URL,
             page: 1,
-            rows: null,
-            limit: 10,
-            selectedLecturer: null,
-            selectedLecture: { title: null, lecturer: null, date: null, location: null, image: null, description: null },
+            total_lectures: null,
+            limit: PAGE_LIMIT,
+            apiUrl: API_URL,
+            lecture: { title: null, lecturer: null, date: null, location: null, image: null, description: null },
             selectedFile: null,
         }
     },
@@ -43,8 +44,9 @@ export default {
         {
             try
             {
-                this.lecturers = await findAllLecturers();
-                console.log('lecturers', this.lecturers);
+                const response = await axios.get(`${this.apiUrl}lecturers?limit=${this.limit}`);
+                const lecturers = response.data;
+                this.lecturers = lecturers.data;
                 this.lecturers.forEach(l => this.lecturersNames.push(l.name));
             } catch (error)
             {
@@ -53,7 +55,7 @@ export default {
         },
         preUpdateLecture(lecture)
         {
-            this.selectedLecture = lecture
+            this.lecture = lecture
             this.$refs.confirmationModal.show({
                 title: 'تأكيد',
                 message: `هل تريد تعديل المحاضرة ${lecture.title}`,
@@ -62,11 +64,11 @@ export default {
         },
         updateLecture()
         {
-            console.log(`update ${this.selectedLecture.title}`)
+            console.log(`update ${this.lecture.title}`)
         },
         preDeleteLecture(lecture)
         {
-            this.selectedLecture = lecture
+            this.lecture = lecture
             this.$refs.confirmationModal.show({
                 title: 'تأكيد',
                 message: `هل تريد حذف المحاضرة ${lecture.title}`,
@@ -75,27 +77,32 @@ export default {
         },
         deleteLecture()
         {
-            console.log(`delete ${this.selectedLecture.title}`)
+            console.log(`delete ${this.lecture.title}`)
         },
         async save()
         {
             // validation
-            if (!this.selectedLecture.title || this.selectedLecture.lecturer || his.selectedLecture.date || this.selectedLecture.location || this.selectedLecture.description)
+            if (!this.lecture.title || this.lecture.lecturer || his.lecture.date || this.lecture.location || this.lecture.description)
             {
 
             }
             const formData = new FormData();
-            formData.append('title', this.selectedLecture.title)
-            formData.append('lecturer', this.selectedLecture.lecturer)
-            formData.append('date', this.selectedLecture.date)
-            formData.append('location', this.selectedLecture.location)
-            formData.append('file', this.selectedFile)
-            formData.append('description', this.selectedLecture.description)
+            formData.append('title', this.lecture.title)
+            formData.append('lecturer', this.lecture.lecturer)
+            formData.append('date', this.lecture.date)
+            formData.append('location', this.lecture.location)
+            formData.append('image', this.selectedFile)
+            formData.append('description', this.lecture.description)
 
-            await saveLecture(formData).then(res =>
+            await axios.post(`${this.apiUrl}lectures`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                },
+            }).then(async res =>
             {
-                console.log('res', res)
                 this.$toast.success('تم اضافة المحاضرة بنجاح')
+                this.lecture = { title: null, lecturer: null, date: null, location: null, image: null, description: null }
+                await this.paginate()
             })
 
         },
@@ -103,13 +110,37 @@ export default {
         {
             this.selectedFile = event.target.files[0]
         },
+        async paginate()
+        {
+            await axios.get(`${this.apiUrl}lectures?limit=${this.limit}&page=${this.page}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }).then(res =>
+            {
+                this.lectures = res.data.data;
+                this.total_lectures = res.data.tot;
+                console.log('lectures', this.lectures);
+                console.log('total_lectures', this.total_lectures);
+            }).catch(err =>
+            {
+                console.log(err);
+            })
+        }
     },
     async mounted()
     {
-        await this.fetchLectures();
+        // await this.fetchLectures();
+        await this.paginate();
         await this.fetchLecturers();
-        this.rows = this.lectures.length;
-    }
+        this.total_lectures = this.lectures.length;
+    },
+    watch: {
+        page: async function ()
+        {
+            await this.paginate();
+        }
+    },
 }
 
 
@@ -149,13 +180,17 @@ export default {
                             <td>{{ lecture.location }}</td>
                             <td>{{ lecture.description }}</td>
                             <td><img :src="imgUrl + lecture.image" alt="image" class="lecture-image"></td>
-                            <td><button class="btn btn-primary" @click="preUpdateLecture(lecture)">تعديل</button>
-                                <button class="btn btn-danger" @click="deleteLecture()">حذف</button>
+                            <td><a href="javascript:void(0)" class="text-primary" @click="select(lecture)"
+                                    data-bs-toggle="modal" data-bs-target="#edit-lecturer-modal"><i
+                                        class="bx bx-edit bx-sm"></i></a>
+                                <a href="javascript:void(0)" class="text-danger" @click="select(lecture)"
+                                    data-bs-toggle="modal" data-bs-target="#delete-lecturer-modal"><i
+                                        class="bx bx-trash bx-sm"></i></a>
                             </td>
                         </tr>
                     </tbody>
                 </table>
-                <b-pagination v-model="page" :total-rows="rows" :per-page="limit" aria-controls="my-table"
+                <b-pagination v-model="page" :total-rows="total_lectures" :per-page="limit" aria-controls="my-table"
                     class="m-2"></b-pagination>
             </div>
         </div>
@@ -170,15 +205,12 @@ export default {
                     </div>
                     <div class="modal-body">
                         <input type="text" placeholder="عنوان المحاضرة" class="form-control m-2"
-                            v-model="selectedLecture.title">
-                        <multiselect v-model="selectedLecture.lecturer" :options="lecturersNames">اسم المحاضر
+                            v-model="lecture.title">
+                        <multiselect v-model="lecture.lecturer" :options="lecturersNames">اسم المحاضر
                         </multiselect>
-                        <input type="date" placeholder="التاريخ" class="form-control m-2"
-                            v-model="selectedLecture.date">
-                        <input type="text" placeholder="الموقع" class="form-control m-2"
-                            v-model="selectedLecture.location">
-                        <input type="text" placeholder="الوصف" class="form-control m-2"
-                            v-model="selectedLecture.description">
+                        <input type="date" placeholder="التاريخ" class="form-control m-2" v-model="lecture.date">
+                        <input type="text" placeholder="الموقع" class="form-control m-2" v-model="lecture.location">
+                        <input type="text" placeholder="الوصف" class="form-control m-2" v-model="lecture.description">
                         <input type="file" placeholder="صورة الإعلان" class="form-control m-2"
                             @change="handleFileChange">
                     </div>
