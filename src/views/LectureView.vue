@@ -57,7 +57,7 @@ export default {
         async updateLecture()
         {
             // validation
-            if (!this.lecture.title || !this.lecture.lecturer || !this.lecture.date || !this.lecture.location || !this.lecture.description)
+            if (!this.lecture.title || !this.lecture.lecturer || !this.lecture.date || !this.lecture.location || !this.lecture.description || !this.selectedFile)
             {
                 this.$toast.error('يرجى ملء جميع الحقول')
                 return
@@ -78,6 +78,7 @@ export default {
             {
                 this.$toast.success('تم تحديث المحاضرة بنجاح')
                 this.lecture = { title: null, lecturer: null, date: null, location: null, image: null, description: null }
+                this.selectedFile = null
                 await this.paginate()
             })
         },
@@ -94,7 +95,7 @@ export default {
         async save()
         {
             // validation
-            if (!this.lecture.title || !this.lecture.lecturer || !this.lecture.date || !this.lecture.location || !this.lecture.description)
+            if (!this.lecture.title || !this.lecture.lecturer || !this.lecture.date || !this.lecture.location || !this.lecture.description || !this.selectedFile)
             {
                 this.$toast.error('يرجى ملء جميع الحقول')
                 return
@@ -115,6 +116,7 @@ export default {
             {
                 this.$toast.success('تم اضافة المحاضرة بنجاح')
                 this.lecture = { title: null, lecturer: null, date: null, location: null, image: null, description: null }
+                this.selectedFile = null
                 await this.paginate()
             })
 

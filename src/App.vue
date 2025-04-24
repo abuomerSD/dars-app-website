@@ -2,7 +2,7 @@
   <router-view></router-view>
 </template>
 <script>
-  
+
 </script>
 <style>
 #app {
@@ -38,4 +38,14 @@ nav a.router-link-exact-active {
   width: 20px;
   height: 20px;
 }
+
+.table thead th {
+  background-color: #169976;
+  color: white;
+}
+
+/* .table thead th {
+  background-color: #213448;
+  color: white;
+} */
 </style>
