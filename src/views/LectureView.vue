@@ -1,11 +1,12 @@
 <script>
 import { STATIC_FILES_URL, API_URL, PAGE_LIMIT } from '@/assets/js/constants';
 import { findAllLectures, saveLecture } from '@/assets/js/lecture';
-import { findAllLecturers } from '@/assets/js/lecturer';
+// import { findAllLecturers } from '@/assets/js/lecturer';
 import Navbar from '@/components/Navbar.vue';
 import Multiselect from 'vue-multiselect';
 import ConfirmationModal from '@/components/modals/ConfirmationModal.vue';
 import axios from 'axios';
+
 
 
 export default {
@@ -18,7 +19,7 @@ export default {
             lecturersNames: [],
             imgUrl: STATIC_FILES_URL,
             page: 1,
-            total_lectures: null,
+            total_lectures: 0,
             limit: PAGE_LIMIT,
             apiUrl: API_URL,
             lecture: { title: null, lecturer: null, date: null, location: null, image: null, description: null },
@@ -53,38 +54,50 @@ export default {
                 console.log(error);
             }
         },
-        preUpdateLecture(lecture)
+        async updateLecture()
         {
-            this.lecture = lecture
-            this.$refs.confirmationModal.show({
-                title: 'تأكيد',
-                message: `هل تريد تعديل المحاضرة ${lecture.title}`,
-                onConfirm: this.updateLecture
+            // validation
+            if (!this.lecture.title || !this.lecture.lecturer || !this.lecture.date || !this.lecture.location || !this.lecture.description)
+            {
+                this.$toast.error('يرجى ملء جميع الحقول')
+                return
+            }
+            const formData = new FormData();
+            formData.append('title', this.lecture.title)
+            formData.append('lecturer', this.lecture.lecturer)
+            formData.append('date', this.lecture.date)
+            formData.append('location', this.lecture.location)
+            formData.append('image', this.selectedFile)
+            formData.append('description', this.lecture.description)
+
+            await axios.put(`${this.apiUrl}lectures/${this.lecture._id}`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                },
+            }).then(async res =>
+            {
+                this.$toast.success('تم تحديث المحاضرة بنجاح')
+                this.lecture = { title: null, lecturer: null, date: null, location: null, image: null, description: null }
+                await this.paginate()
             })
         },
-        updateLecture()
+        async deleteLecture()
         {
-            console.log(`update ${this.lecture.title}`)
-        },
-        preDeleteLecture(lecture)
-        {
-            this.lecture = lecture
-            this.$refs.confirmationModal.show({
-                title: 'تأكيد',
-                message: `هل تريد حذف المحاضرة ${lecture.title}`,
-                onConfirm: this.deleteLecture
+            const id = this.lecture._id
+            await axios.delete(`${this.apiUrl}lectures/${id}`).then(async res =>
+            {
+                this.$toast.success('تم حذف المحاضرة بنجاح')
+                this.lecture = { title: null, lecturer: null, date: null, location: null, image: null, description: null }
+                await this.paginate()
             })
-        },
-        deleteLecture()
-        {
-            console.log(`delete ${this.lecture.title}`)
         },
         async save()
         {
             // validation
-            if (!this.lecture.title || this.lecture.lecturer || his.lecture.date || this.lecture.location || this.lecture.description)
+            if (!this.lecture.title || !this.lecture.lecturer || !this.lecture.date || !this.lecture.location || !this.lecture.description)
             {
-
+                this.$toast.error('يرجى ملء جميع الحقول')
+                return
             }
             const formData = new FormData();
             formData.append('title', this.lecture.title)
@@ -126,14 +139,18 @@ export default {
             {
                 console.log(err);
             })
-        }
+        },
+        select(lecture)
+        {
+            this.lecture = lecture
+            console.log('selected lecture', this.lecture);
+        },
     },
     async mounted()
     {
         // await this.fetchLectures();
         await this.paginate();
         await this.fetchLecturers();
-        this.total_lectures = this.lectures.length;
     },
     watch: {
         page: async function ()
@@ -181,10 +198,10 @@ export default {
                             <td>{{ lecture.description }}</td>
                             <td><img :src="imgUrl + lecture.image" alt="image" class="lecture-image"></td>
                             <td><a href="javascript:void(0)" class="text-primary" @click="select(lecture)"
-                                    data-bs-toggle="modal" data-bs-target="#edit-lecturer-modal"><i
+                                    data-bs-toggle="modal" data-bs-target="#editLectureModal"><i
                                         class="bx bx-edit bx-sm"></i></a>
                                 <a href="javascript:void(0)" class="text-danger" @click="select(lecture)"
-                                    data-bs-toggle="modal" data-bs-target="#delete-lecturer-modal"><i
+                                    data-bs-toggle="modal" data-bs-target="#deleteLectureModal"><i
                                         class="bx bx-trash bx-sm"></i></a>
                             </td>
                         </tr>
@@ -194,6 +211,7 @@ export default {
                     class="m-2"></b-pagination>
             </div>
         </div>
+        <!-- Modals Start -->
         <!-- add lecture modal start -->
         <div class="modal fade" id="addLectureModal" tabindex="-1" aria-labelledby="exampleModalLabel"
             aria-hidden="true">
@@ -216,13 +234,65 @@ export default {
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="save">حفظ</button>
+                        <button type="button" class="btn btn-success" data-bs-dismiss="modal" @click="save">حفظ</button>
                     </div>
                 </div>
             </div>
         </div>
         <!-- add lecture modal end -->
-        <ConfirmationModal ref="confirmationModal" />
+        <!-- edit lecture modal start -->
+        <div class="modal fade" id="editLectureModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">تعديل محاضرة</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text" placeholder="عنوان المحاضرة" class="form-control m-2"
+                            v-model="lecture.title">
+                        <multiselect v-model="lecture.lecturer" :options="lecturersNames">اسم المحاضر
+                        </multiselect>
+                        <input type="date" placeholder="التاريخ" class="form-control m-2" v-model="lecture.date">
+                        <input type="text" placeholder="الموقع" class="form-control m-2" v-model="lecture.location">
+                        <input type="text" placeholder="الوصف" class="form-control m-2" v-model="lecture.description">
+                        <input type="file" placeholder="صورة الإعلان" class="form-control m-2"
+                            @change="handleFileChange">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                            @click="updateLecture">تحديث</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- edit lecture modal end -->
+        <!-- delete lecture modal start -->
+        <div class="modal fade" id="deleteLectureModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">تعديل محاضرة</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        هل تريد حذف المحاضرة {{ lecture.title }}؟
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal"
+                            @click="deleteLecture">حذف</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- delete lecture modal end -->
+
+        <!-- <ConfirmationModal ref="confirmationModal" /> -->
+        <!-- Modals End -->
     </div>
 </template>
 
