@@ -12,7 +12,8 @@
                 <div class="row">
                     <div class="col-4"></div>
                     <div class="col-4">
-                        <input v-model="password" type="password" placeholder="كلمة المرور" class="form-control m-2" vlaue=""/>
+                        <input v-model="password" type="password" placeholder="كلمة المرور" class="form-control m-2"
+                            vlaue="" />
                     </div>
                 </div>
                 <div class="row">
@@ -28,7 +29,7 @@
     </div>
 </template>
 <script>
-import {login} from '@/assets/js/user.js';
+import { login } from '@/assets/js/user.js';
 export default {
     name: 'LoginView',
     data()
@@ -53,9 +54,14 @@ export default {
                 console.log('logged');
             } else
             {
-                alert(response.data.message);
+                this.$toast.error(response.data.message);
             }
-        }
+        },
+    },
+    mounted()
+    {
+        this.username = ''
+        this.password = ''
     }
 }
 </script>

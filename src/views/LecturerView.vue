@@ -35,9 +35,11 @@ export default {
                 return
             }
             const formData = new FormData()
+            const token = localStorage.getItem('token');
             formData.append('name', this.lecturer.name)
             formData.append('nationality', this.lecturer.nationality)
             formData.append('image', this.file)
+            formData.append('token', token)
 
             await axios.post(`${this.apiUrl}lecturers`, formData, {
                 headers: {
@@ -78,9 +80,11 @@ export default {
                 return
             }
             const formData = new FormData()
+            const token = localStorage.getItem('token');
             formData.append('name', this.lecturer.name)
             formData.append('nationality', this.lecturer.nationality)
             formData.append('image', this.file)
+            formData.append('token', token)
             const id = this.lecturer._id
 
             await axios.put(`${this.apiUrl}lecturers/${id}`, formData, {
@@ -100,7 +104,8 @@ export default {
         {
             console.log('lecturer', this.lecturer)
             const id = this.lecturer._id
-            await axios.delete(`${this.apiUrl}lecturers/${id}`).then(async res =>
+            const token = localStorage.getItem('token');
+            await axios.delete(`${this.apiUrl}lecturers/${id}`, { token }).then(async res =>
             {
                 console.log('res', res)
                 this.$toast.success('تم حذف بيانات الشيخ بنجاح')
@@ -131,7 +136,8 @@ export default {
         <div class="row">
             <div class="col-lg-11"></div>
             <div class="col-lg-1"><a href="javascript:void(0)" data-bs-toggle="modal"
-                    data-bs-target="#add-lecturer-modal"><i class="bx bx-plus-medical bx-sm"></i></a></div>
+                    data-bs-target="#add-lecturer-modal" style="color: #169976"><i
+                        class="bx bx-plus-medical bx-sm"></i></a></div>
         </div>
         <h5 class="text-center">المشايخ</h5>
         <div class="table-responsive">

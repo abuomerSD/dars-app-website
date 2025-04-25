@@ -17,14 +17,26 @@
                     </li>
                 </ul>
             </div>
+            <button class="btn btn-outline-danger" @click="logout">تسجيل الخروج</button>
         </div>
     </nav>
 </template>
 
 <script>
 export default {
-
+    methods: {
+        logout()
+        {
+            localStorage.removeItem('token'); // أو أي اسم تستخدمه للتوكن
+            this.$router.push('/login');
+        }
+    }
 }
 </script>
 
-<style></style>
+<style scoped>
+.logo {
+    height: 40px;
+    margin-left: 10px;
+}
+</style>

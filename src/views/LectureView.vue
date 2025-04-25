@@ -63,12 +63,14 @@ export default {
                 return
             }
             const formData = new FormData();
+            const token = localStorage.getItem('token');
             formData.append('title', this.lecture.title)
             formData.append('lecturer', this.lecture.lecturer)
             formData.append('date', this.lecture.date)
             formData.append('location', this.lecture.location)
             formData.append('image', this.selectedFile)
             formData.append('description', this.lecture.description)
+            formData.append('token', token)
 
             await axios.put(`${this.apiUrl}lectures/${this.lecture._id}`, formData, {
                 headers: {
@@ -85,7 +87,8 @@ export default {
         async deleteLecture()
         {
             const id = this.lecture._id
-            await axios.delete(`${this.apiUrl}lectures/${id}`).then(async res =>
+            const token = localStorage.getItem('token');
+            await axios.delete(`${this.apiUrl}lectures/${id}`, { token }).then(async res =>
             {
                 this.$toast.success('تم حذف المحاضرة بنجاح')
                 this.lecture = { title: null, lecturer: null, date: null, location: null, image: null, description: null }
@@ -101,12 +104,14 @@ export default {
                 return
             }
             const formData = new FormData();
+            const token = localStorage.getItem('token');
             formData.append('title', this.lecture.title)
             formData.append('lecturer', this.lecture.lecturer)
             formData.append('date', this.lecture.date)
             formData.append('location', this.lecture.location)
             formData.append('image', this.selectedFile)
             formData.append('description', this.lecture.description)
+            formData.append('token', token)
 
             await axios.post(`${this.apiUrl}lectures`, formData, {
                 headers: {
@@ -171,8 +176,8 @@ export default {
         <div class="row">
             <div class="col-lg-11 col-sm-12"></div>
             <div class="col-lg-1 col-sm-12">
-                <a href="javascrip:void(0)" data-bs-toggle="modal" data-bs-target="#addLectureModal"><i
-                        class='bx bx-plus-medical bx-sm'></i></a>
+                <a href="javascrip:void(0)" data-bs-toggle="modal" data-bs-target="#addLectureModal"
+                    style="color: #169976"><i class='bx bx-plus-medical bx-sm'></i></a>
             </div>
         </div>
         <div class="row">
