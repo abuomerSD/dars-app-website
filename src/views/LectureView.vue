@@ -70,11 +70,12 @@ export default {
             formData.append('location', this.lecture.location)
             formData.append('image', this.selectedFile)
             formData.append('description', this.lecture.description)
-            formData.append('token', token)
+            // formData.append('token', token)
 
             await axios.put(`${this.apiUrl}lectures/${this.lecture._id}`, formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data'
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': `Bearer ${token}`,
                 },
             }).then(async res =>
             {
@@ -88,7 +89,11 @@ export default {
         {
             const id = this.lecture._id
             const token = localStorage.getItem('token');
-            await axios.delete(`${this.apiUrl}lectures/${id}`, { token }).then(async res =>
+            await axios.delete(`${this.apiUrl}lectures/${id}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
+            }).then(async res =>
             {
                 this.$toast.success('تم حذف المحاضرة بنجاح')
                 this.lecture = { title: null, lecturer: null, date: null, location: null, image: null, description: null }
@@ -111,11 +116,12 @@ export default {
             formData.append('location', this.lecture.location)
             formData.append('image', this.selectedFile)
             formData.append('description', this.lecture.description)
-            formData.append('token', token)
+            // formData.append('token', token)
 
             await axios.post(`${this.apiUrl}lectures`, formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data'
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': `Bearer ${token}`,
                 },
             }).then(async res =>
             {

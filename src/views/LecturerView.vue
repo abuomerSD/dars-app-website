@@ -39,11 +39,12 @@ export default {
             formData.append('name', this.lecturer.name)
             formData.append('nationality', this.lecturer.nationality)
             formData.append('image', this.file)
-            formData.append('token', token)
+            // formData.append('token', token)
 
             await axios.post(`${this.apiUrl}lecturers`, formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data'
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': `Bearer ${token}`,
                 },
             }).then(async res =>
             {
@@ -84,12 +85,13 @@ export default {
             formData.append('name', this.lecturer.name)
             formData.append('nationality', this.lecturer.nationality)
             formData.append('image', this.file)
-            formData.append('token', token)
+            // formData.append('token', token)
             const id = this.lecturer._id
 
             await axios.put(`${this.apiUrl}lecturers/${id}`, formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data'
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': `Bearer ${token}`,
                 },
             }).then(async res =>
             {
@@ -105,7 +107,12 @@ export default {
             console.log('lecturer', this.lecturer)
             const id = this.lecturer._id
             const token = localStorage.getItem('token');
-            await axios.delete(`${this.apiUrl}lecturers/${id}`, { token }).then(async res =>
+            await axios.delete(`${this.apiUrl}lecturers/${id}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data',
+                }
+            }).then(async res =>
             {
                 console.log('res', res)
                 this.$toast.success('تم حذف بيانات الشيخ بنجاح')
