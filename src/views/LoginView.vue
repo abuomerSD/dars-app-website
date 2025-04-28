@@ -5,13 +5,13 @@
                 <h3>تسجيل الدخول</h3>
                 <div class="row">
                     <div class="col-4"></div>
-                    <div class="col-4">
+                    <div class="col-sm-4 col-md-4 col-lg-4">
                         <input v-model="username" placeholder="اسم المستخدم" class="form-control m-2" value="" />
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-4"></div>
-                    <div class="col-4">
+                    <div class="col-sm-4 col-md-4 col-lg-4">
                         <input v-model="password" type="password" placeholder="كلمة المرور" class="form-control m-2"
                             vlaue="" />
                     </div>

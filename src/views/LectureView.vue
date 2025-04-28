@@ -158,6 +158,27 @@ export default {
             this.lecture = lecture
             console.log('selected lecture', this.lecture);
         },
+        async sendNotification(lecture)
+        {
+            try
+            {
+                // Example API call to send notification
+                const response = await axios.post(`${this.apiUrl}lectures/${lecture._id}/notify`, {}, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    },
+                });
+                if (response.data.success)
+                {
+                    this.$toast.success('تم إرسال الإشعار بنجاح');
+                    lecture.NotificationSent = true; // Update the lecture's NotificationSent status
+                }
+            } catch (error)
+            {
+                console.error('Error sending notification:', error);
+                this.$toast.error('حدث خطأ أثناء إرسال الإشعار');
+            }
+        },
     },
     async mounted()
     {
@@ -172,6 +193,7 @@ export default {
         }
     },
 }
+
 
 
 </script>
@@ -199,6 +221,7 @@ export default {
                             <th scope="col">الوصف</th>
                             <th scope="col">صورة الاعلان</th>
                             <th scope="col">تعديل \ حذف</th>
+                            <th scope="col">إرسال إشعار</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -210,12 +233,19 @@ export default {
                             <td>{{ lecture.location }}</td>
                             <td>{{ lecture.description }}</td>
                             <td><img :src="imgUrl + lecture.image" alt="image" class="lecture-image"></td>
-                            <td><a href="javascript:void(0)" class="text-primary" @click="select(lecture)"
+                            <td>
+                                <a href="javascript:void(0)" class="text-primary" @click="select(lecture)"
                                     data-bs-toggle="modal" data-bs-target="#editLectureModal"><i
                                         class="bx bx-edit bx-sm"></i></a>
                                 <a href="javascript:void(0)" class="text-danger" @click="select(lecture)"
                                     data-bs-toggle="modal" data-bs-target="#deleteLectureModal"><i
                                         class="bx bx-trash bx-sm"></i></a>
+                            </td>
+                            <td>
+                                <button :class="lecture.NotificationSent ? 'btn btn-success' : 'btn btn-danger'"
+                                    :disabled="lecture.NotificationSent" @click="sendNotification(lecture)">
+                                    {{ lecture.NotificationSent ? 'تم الإرسال' : 'إرسال' }}
+                                </button>
                             </td>
                         </tr>
                     </tbody>
@@ -311,7 +341,7 @@ export default {
 
 
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
-<style>
+<style scoped>
 .lecture-image {
     width: 150px;
     height: 100px;
