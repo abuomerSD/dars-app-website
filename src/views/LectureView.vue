@@ -163,15 +163,20 @@ export default {
             try
             {
                 // Example API call to send notification
-                const response = await axios.post(`${this.apiUrl}lectures/${lecture._id}/notify`, {}, {
+                const response = await axios.post(`${this.apiUrl}lectures/send-notification-to-all`, {id: lecture._id, title: lecture.title, body: `${lecture.lecturer}
+                                                            ${lecture.location}
+                                                            ${lecture.description}
+                                                            ${lecture.date}`}, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`,
                     },
                 });
-                if (response.data.success)
+                console.log('res', response)
+                if (response.data.status === "success")
                 {
                     this.$toast.success('تم إرسال الإشعار بنجاح');
                     lecture.NotificationSent = true; // Update the lecture's NotificationSent status
+                    await this.paginate();
                 }
             } catch (error)
             {

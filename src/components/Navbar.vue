@@ -15,6 +15,9 @@
                     <li>
                         <router-link to="/lecturers" class="nav-link">المشايخ</router-link>
                     </li>
+                    <li>
+                        <router-link to="/users" class="nav-link">إدارة المشرفين</router-link>
+                    </li>
                 </ul>
             </div>
             <button class="btn btn-outline-danger" @click="logout">تسجيل الخروج</button>

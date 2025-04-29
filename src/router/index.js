@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import LectureView from "../views/LectureView.vue";
 import LecturerView from "../views/LecturerView.vue";
 import LoginView from "../views/LoginView.vue";
+import UsersView from "@/views/UsersView.vue";
 
 const routes = [
   {
@@ -30,6 +31,12 @@ const routes = [
     path: "/login",
     name: "login",
     component: LoginView
+  },
+  {
+    path: "/users",
+    name: "users",
+    component: UsersView,
+    meta: {requiresAuth: true},
   },
 ];
 
